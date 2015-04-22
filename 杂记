@@ -1,0 +1,4 @@
+1.  ejabberd日志文件默认为beam进程当前工作目录下的ejabberd.log
+    错误日志为error.log
+    
+2. 如果配置了环境变量EJABBERD_PID_PATH， ejabberd会将所在VM的操作系统进程ID写入该文件中。
