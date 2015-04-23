@@ -1,0 +1,40 @@
+1. ejabberd 的启动入口在ejabberd_app.erl的start(normal, _Args)， 主要做了如下工作
+	
+	ejabberd_logger:start(),                          启动lagger日志应用
+    write_pid_file(),                                 如果配置了pid文件， 把进程pid写入该文件中
+    start_apps(),                                     启动它所依赖的应用， 包括:
+																			ejabberd:start_app(sasl),
+																			ejabberd:start_app(ssl),
+																			ejabberd:start_app(p1_yaml),
+																			ejabberd:start_app(p1_tls),
+																			ejabberd:start_app(p1_xml),
+																			ejabberd:start_app(p1_stringprep),
+																			ejabberd:start_app(p1_zlib),
+																			ejabberd:start_app(p1_cache_tab).
+	ejabberd:check_app(ejabberd),                       确保ejabberd应用的模块都存在
+    randoms:start(),                                   启动随机数发生器， 该随机发生器负责生成数字形式的随机字符串。
+    db_init(),                                         初始化mnesia数据库
+    start(),                                           生成ejabberd， 该进程是一个空循环， 什么也不做。
+    translate:start(),                                 加载国际化消息到mnesia translate表中。
+    ejabberd_ctl:init(),
+    ejabberd_commands:init(),
+    ejabberd_admin:start(),
+    gen_mod:start(),
+    ejabberd_config:start(),
+    set_loglevel_from_config(),
+    acl:start(),
+    shaper:start(),
+    connect_nodes(),                  %%形成全连通网络
+    Sup = ejabberd_sup:start_link(),
+    ejabberd_rdbms:start(),
+    ejabberd_riak_sup:start(),
+    ejabberd_auth:start(),
+    cyrsasl:start(),
+    % Profiling
+    %ejabberd_debug:eprof_start(),
+    %ejabberd_debug:fprof_start(),
+    maybe_add_nameservers(),
+    start_modules(),
+    ejabberd_listener:start_listeners(),           %%最后开启监听器
+    ?INFO_MSG("ejabberd ~s is started in the node ~p", [?VERSION, node()]),
+    Sup;
